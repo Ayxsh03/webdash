@@ -2,8 +2,28 @@ import { Users, Car, Shield, Activity, Zap, UserCheck } from "lucide-react";
 import { StatsCard } from "@/components/dashboard/StatsCard";
 import { EventChart } from "@/components/dashboard/EventChart";
 import { DateRangePicker } from "@/components/dashboard/DateRangePicker";
+import { useDashboardStats, useCameras } from "@/hooks/useDetectionData";
 
 const Dashboard = () => {
+  const { data: stats, isLoading: statsLoading } = useDashboardStats();
+  const { data: cameras } = useCameras();
+
+  if (statsLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
+          <DateRangePicker />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="h-32 bg-card animate-pulse rounded-lg" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -15,40 +35,40 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
         <StatsCard
           title="Total Events"
-          value="2,847"
+          value={stats?.total_events || 0}
           icon={Activity}
-          trend={{ value: 12.5, label: "from last week" }}
+          trend={{ value: stats?.events_trend || 0, label: "from yesterday" }}
         />
         <StatsCard
           title="Active Devices"
-          value="42"
+          value={stats?.active_devices || 0}
           icon={Shield}
           status="active"
-          trend={{ value: 2.1, label: "from last week" }}
+          trend={{ value: stats?.devices_trend || 0, label: "this week" }}
         />
         <StatsCard
           title="Inactive Devices"
-          value="8"
+          value={stats?.inactive_devices || 0}
           icon={Shield}
           status="inactive"
         />
         <StatsCard
           title="Online Devices"
-          value="38"
+          value={stats?.online_devices || 0}
           icon={Zap}
           status="online"
         />
         <StatsCard
           title="Offline Devices"
-          value="12"
+          value={stats?.offline_devices || 0}
           icon={Zap}
           status="offline"
         />
         <StatsCard
           title="People Detected"
-          value="1,234"
+          value={stats?.people_detected || 0}
           icon={Users}
-          trend={{ value: 8.2, label: "from yesterday" }}
+          trend={{ value: stats?.people_trend || 0, label: "from yesterday" }}
         />
       </div>
 

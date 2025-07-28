@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Search, Download, Filter, Eye, Trash2, Edit } from "lucide-react";
+import { Search, Download, Filter, Eye, Trash2, Edit, MoreHorizontal, RotateCcw } from "lucide-react";
+import { useDetectionEvents } from "@/hooks/useDetectionData";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -54,6 +55,8 @@ const mockFootfallData = [
 
 const Footfall = () => {
   const [searchTerm, setSearchTerm] = useState("");
+  const [page, setPage] = useState(1);
+  const { data: eventsData, isLoading } = useDetectionEvents(page, 10, searchTerm);
 
   return (
     <div className="space-y-6">
@@ -118,54 +121,106 @@ const Footfall = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {mockFootfallData.map((event) => (
-                <TableRow key={event.id} className="border-border">
-                  <TableCell>
-                    <div className="w-16 h-12 bg-muted rounded-md flex items-center justify-center">
-                      <span className="text-xs text-muted-foreground">IMG</span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-foreground">{event.timestamp}</TableCell>
-                  <TableCell className="text-foreground">{event.location}</TableCell>
-                  <TableCell>
-                    <Badge variant="secondary">{event.person_count} people</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge 
-                      variant={event.confidence > 95 ? "default" : "secondary"}
-                      className={event.confidence > 95 ? "bg-success text-success-foreground" : ""}
-                    >
-                      {event.confidence}%
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {event.gender} • {event.age_group}
-                  </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="sm">
-                          Actions
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem>
-                          <Eye className="h-4 w-4 mr-2" />
-                          View Logs
-                        </DropdownMenuItem>
-                        <DropdownMenuItem>
-                          <Edit className="h-4 w-4 mr-2" />
-                          Convert
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive">
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+              {isLoading ? (
+                // Loading skeleton
+                [...Array(5)].map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell><div className="w-16 h-12 bg-muted animate-pulse rounded" /></TableCell>
+                    <TableCell><div className="h-4 bg-muted animate-pulse rounded w-32" /></TableCell>
+                    <TableCell><div className="h-6 bg-muted animate-pulse rounded w-20" /></TableCell>
+                    <TableCell><div className="h-4 bg-muted animate-pulse rounded w-8" /></TableCell>
+                    <TableCell><div className="h-6 bg-muted animate-pulse rounded w-16" /></TableCell>
+                    <TableCell><div className="h-8 bg-muted animate-pulse rounded w-24" /></TableCell>
+                    <TableCell><div className="h-8 bg-muted animate-pulse rounded w-8" /></TableCell>
+                  </TableRow>
+                ))
+              ) : eventsData?.events?.length ? (
+                eventsData.events.map((event) => (
+                  <TableRow key={event.id}>
+                    <TableCell>
+                      <div className="w-16 h-12 bg-muted rounded overflow-hidden">
+                        {event.image_path ? (
+                          <img 
+                            src={`/api/images/${event.image_path}`}
+                            alt="Detection"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
+                            <span className="text-xs text-muted-foreground">No Image</span>
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-col">
+                        <span className="font-medium">
+                          {new Date(event.timestamp).toLocaleString()}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="secondary">{event.camera_name}</Badge>
+                    </TableCell>
+                    <TableCell>
+                      <span className="font-medium">ID: {event.person_id}</span>
+                    </TableCell>
+                    <TableCell>
+                      <Badge 
+                        variant={
+                          event.confidence >= 0.8 
+                            ? "default" 
+                            : event.confidence >= 0.6 
+                              ? "secondary" 
+                              : "destructive"
+                        }
+                      >
+                        {(event.confidence * 100).toFixed(1)}%
+                      </Badge>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-sm text-muted-foreground">
+                        <div>Alert: {event.alert_sent ? "✓ Sent" : "✗ Not sent"}</div>
+                        {event.metadata?.bbox && (
+                          <div className="text-xs">
+                            Position: {event.metadata.bbox.slice(0, 2).map(Math.round).join(", ")}
+                          </div>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>
+                            <Eye className="mr-2 h-4 w-4" />
+                            View Details
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <RotateCcw className="mr-2 h-4 w-4" />
+                            Resend Alert
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="text-destructive">
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
+                    No detection events found
                   </TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
         </CardContent>

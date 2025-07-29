@@ -42,13 +42,13 @@ export const Sidebar = ({ collapsed, onToggleCollapse }: SidebarProps) => {
       "fixed left-0 top-0 h-screen bg-sidebar border-r border-sidebar-border transition-all duration-300 z-50",
       collapsed ? "w-16" : "w-64"
     )}>
-      <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
-        <div className={cn("flex items-center gap-2", collapsed && "justify-center")}>
-          <Shield className="h-8 w-8 text-primary" />
-          {!collapsed && (
+      <div className={cn("flex items-center p-4 border-b border-sidebar-border", collapsed ? "justify-center" : "justify-between")}>
+        {!collapsed && (
+          <div className="flex items-center gap-2">
+            <Shield className="h-8 w-8 text-primary" />
             <span className="text-xl font-bold text-sidebar-foreground">SecureWatch</span>
-          )}
-        </div>
+          </div>
+        )}
         <Button
           variant="ghost"
           size="sm"

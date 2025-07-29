@@ -1,101 +1,107 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Shield, Mail, Lock } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Card, CardContent } from "@/components/ui/card";
+import { useNavigate } from "react-router-dom";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState("hello@visionfacts.ai");
   const [password, setPassword] = useState("");
-  const [rememberMe, setRememberMe] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log("Login attempt:", { email, password, rememberMe });
+    // Simple login logic - in real app, this would validate credentials
+    navigate("/");
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md bg-gradient-card border-border/50">
-        <CardHeader className="text-center space-y-4">
-          <div className="flex justify-center">
-            <div className="p-3 rounded-lg bg-primary/10">
-              <Shield className="h-8 w-8 text-primary" />
+    <div className="min-h-screen bg-background flex">
+      {/* Left side - Hero Image */}
+      <div className="hidden lg:flex lg:w-1/2 relative">
+        <img
+          src="/lovable-uploads/4f07add8-4c4c-4394-b207-0521b3a99685.png"
+          alt="Person detection visualization"
+          className="w-full h-full object-cover"
+        />
+      </div>
+
+      {/* Right side - Login Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
+        <div className="w-full max-w-md space-y-8">
+          {/* Logo and Title */}
+          <div className="text-center space-y-4">
+            <h1 className="text-3xl font-bold text-primary">Visionfacts</h1>
+            <div className="space-y-2">
+              <h2 className="text-2xl font-semibold text-foreground">Sign In</h2>
+              <p className="text-muted-foreground">Please enter your details to Sign in</p>
             </div>
           </div>
-          <CardTitle className="text-2xl font-bold text-foreground">
-            SecureWatch
-          </CardTitle>
-          <p className="text-muted-foreground">
-            Sign in to your monitoring dashboard
-          </p>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-foreground">Email</Label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10 bg-background border-border"
-                  required
-                />
-              </div>
-            </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-foreground">Password</Label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 bg-background border-border"
-                  required
-                />
-              </div>
-            </div>
+          {/* Login Form */}
+          <Card className="bg-card border-border">
+            <CardContent className="p-6">
+              <form onSubmit={handleLogin} className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-foreground">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Enter the email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="bg-background border-border"
+                    required
+                  />
+                </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="remember"
-                  checked={rememberMe}
-                  onCheckedChange={(checked) => setRememberMe(checked as boolean)}
-                />
-                <Label htmlFor="remember" className="text-sm text-muted-foreground">
-                  Remember me for 30 days
-                </Label>
-              </div>
-              <Link 
-                to="/forgot-password" 
-                className="text-sm text-primary hover:underline"
-              >
-                Forgot password?
-              </Link>
-            </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="password" className="text-foreground">Password</Label>
+                    <a href="#" className="text-sm text-primary hover:underline">
+                      Forgot password
+                    </a>
+                  </div>
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter the password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      className="bg-background border-primary pr-10"
+                      required
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                      onClick={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? (
+                        <EyeOff className="h-4 w-4 text-muted-foreground" />
+                      ) : (
+                        <Eye className="h-4 w-4 text-muted-foreground" />
+                      )}
+                    </Button>
+                  </div>
+                </div>
 
-            <Button 
-              type="submit" 
-              className="w-full bg-gradient-primary hover:shadow-primary transition-all duration-300"
-            >
-              Sign In
-            </Button>
-          </form>
-        </CardContent>
-      </Card>
+                <Button 
+                  type="submit" 
+                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                >
+                  Sign In
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 };

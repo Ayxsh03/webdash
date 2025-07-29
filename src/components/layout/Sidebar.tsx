@@ -25,11 +25,8 @@ const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/" },
   { icon: Users, label: "Footfall", href: "/footfall" },
   { icon: Brain, label: "AI Intelligence", href: "/ai-intelligence" },
-  { icon: UserCheck, label: "AI Attendance", href: "/ai-attendance" },
-  { icon: Car, label: "Vehicle Detection", href: "/vehicle-detection" },
   { icon: Users2, label: "People Count", href: "/people-count" },
-  { icon: ParkingCircle, label: "Parking Mgmt", href: "/parking" },
-  { icon: Package, label: "Assets", href: "/assets" },
+  { icon: Package, label: "Assets", href: "/assets", hasSubmenu: true },
   { icon: Settings, label: "Settings", href: "/settings" },
   { icon: Activity, label: "Activity Log", href: "/activity-log" },
 ];
@@ -46,7 +43,7 @@ export const Sidebar = ({ collapsed, onToggleCollapse }: SidebarProps) => {
         {!collapsed && (
           <div className="flex items-center gap-2">
             <Shield className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold text-sidebar-foreground">SecureWatch</span>
+            <span className="text-xl font-bold text-sidebar-foreground">Visionfacts</span>
           </div>
         )}
         <Button

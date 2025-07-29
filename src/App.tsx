@@ -6,6 +6,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import Footfall from "./pages/Footfall";
+import AIIntelligence from "./pages/AIIntelligence";
+import PeopleCount from "./pages/PeopleCount";
+import Assets from "./pages/Assets";
+import Settings from "./pages/Settings";
+import ActivityLog from "./pages/ActivityLog";
 import NotFound from "./pages/NotFound";
 import { DashboardLayout } from "./components/layout/DashboardLayout";
 
@@ -31,42 +36,27 @@ const App = () => (
           } />
           <Route path="/ai-intelligence" element={
             <DashboardLayout>
-              <div className="text-center text-muted-foreground">AI Intelligence page coming soon...</div>
-            </DashboardLayout>
-          } />
-          <Route path="/ai-attendance" element={
-            <DashboardLayout>
-              <div className="text-center text-muted-foreground">AI Attendance page coming soon...</div>
-            </DashboardLayout>
-          } />
-          <Route path="/vehicle-detection" element={
-            <DashboardLayout>
-              <div className="text-center text-muted-foreground">Vehicle Detection page coming soon...</div>
+              <AIIntelligence />
             </DashboardLayout>
           } />
           <Route path="/people-count" element={
             <DashboardLayout>
-              <div className="text-center text-muted-foreground">People Count page coming soon...</div>
-            </DashboardLayout>
-          } />
-          <Route path="/parking" element={
-            <DashboardLayout>
-              <div className="text-center text-muted-foreground">Parking Management page coming soon...</div>
+              <PeopleCount />
             </DashboardLayout>
           } />
           <Route path="/assets" element={
             <DashboardLayout>
-              <div className="text-center text-muted-foreground">Assets page coming soon...</div>
+              <Assets />
             </DashboardLayout>
           } />
           <Route path="/settings" element={
             <DashboardLayout>
-              <div className="text-center text-muted-foreground">Settings page coming soon...</div>
+              <Settings />
             </DashboardLayout>
           } />
           <Route path="/activity-log" element={
             <DashboardLayout>
-              <div className="text-center text-muted-foreground">Activity Log page coming soon...</div>
+              <ActivityLog />
             </DashboardLayout>
           } />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

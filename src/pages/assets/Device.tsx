@@ -147,11 +147,20 @@ const Device = () => {
           />
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+            onClick={() => console.log("Filter devices")}
+          >
             <Filter className="h-4 w-4 mr-2" />
             FILTER
           </Button>
-          <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground">
+          <Button 
+            size="sm" 
+            className="bg-primary hover:bg-primary/90 text-primary-foreground"
+            onClick={() => console.log("Add new device")}
+          >
             <Plus className="h-4 w-4 mr-2" />
             ADD
           </Button>
@@ -210,16 +219,29 @@ const Device = () => {
                         <span className="text-primary font-medium">ACTION</span>
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-card border-border">
-                      <DropdownMenuItem className="hover:bg-muted cursor-pointer">
+                    <DropdownMenuContent align="end" className="bg-popover border-border">
+                      <DropdownMenuItem 
+                        className="hover:bg-muted cursor-pointer"
+                        onClick={() => console.log("View details for device:", device.id)}
+                      >
                         <Eye className="mr-2 h-4 w-4" />
                         View Details
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="hover:bg-muted cursor-pointer">
+                      <DropdownMenuItem 
+                        className="hover:bg-muted cursor-pointer"
+                        onClick={() => console.log("Edit device:", device.id)}
+                      >
                         <Edit className="mr-2 h-4 w-4" />
                         Edit Device
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive hover:bg-destructive/10 cursor-pointer">
+                      <DropdownMenuItem 
+                        className="text-destructive hover:bg-destructive/10 cursor-pointer"
+                        onClick={() => {
+                          if (confirm("Are you sure you want to delete this device?")) {
+                            console.log("Delete device:", device.id);
+                          }
+                        }}
+                      >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Delete
                       </DropdownMenuItem>

@@ -49,6 +49,11 @@ const App = () => (
               <Assets />
             </DashboardLayout>
           } />
+          <Route path="/assets/:tab" element={
+            <DashboardLayout>
+              <Assets />
+            </DashboardLayout>
+          } />
           <Route path="/settings" element={
             <DashboardLayout>
               <Settings />

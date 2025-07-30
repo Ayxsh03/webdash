@@ -89,12 +89,34 @@ const Footfall = () => {
                   className="pl-10 bg-background border-border"
                 />
               </div>
-              <Button variant="outline" size="sm">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => {
+                  // Filter functionality
+                  console.log("Filter clicked");
+                }}
+              >
                 <Filter className="h-4 w-4 mr-2" />
                 Filter
               </Button>
             </div>
-            <Button variant="gradient" size="sm">
+            <Button 
+              variant="gradient" 
+              size="sm"
+              onClick={() => {
+                // Export functionality
+                console.log("Export CSV clicked");
+                const csvData = "ID,Location,Count,Timestamp\n1,Main Entrance,5,2024-01-28 09:15:23";
+                const blob = new Blob([csvData], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'footfall-data.csv';
+                a.click();
+                window.URL.revokeObjectURL(url);
+              }}
+            >
               <Download className="h-4 w-4 mr-2" />
               Export CSV
             </Button>
@@ -196,16 +218,29 @@ const Footfall = () => {
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
+                        <DropdownMenuContent align="end" className="bg-popover border-border">
+                          <DropdownMenuItem 
+                            className="cursor-pointer"
+                            onClick={() => console.log("View details for event:", event.id)}
+                          >
                             <Eye className="mr-2 h-4 w-4" />
                             View Details
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem 
+                            className="cursor-pointer"
+                            onClick={() => console.log("Resend alert for event:", event.id)}
+                          >
                             <RotateCcw className="mr-2 h-4 w-4" />
                             Resend Alert
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive">
+                          <DropdownMenuItem 
+                            className="text-destructive cursor-pointer"
+                            onClick={() => {
+                              if (confirm("Are you sure you want to delete this event?")) {
+                                console.log("Delete event:", event.id);
+                              }
+                            }}
+                          >
                             <Trash2 className="mr-2 h-4 w-4" />
                             Delete
                           </DropdownMenuItem>

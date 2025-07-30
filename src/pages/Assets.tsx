@@ -25,7 +25,7 @@ const Assets = () => {
   ];
 
   const renderContent = () => {
-    switch (currentTab) {
+    switch (activeTab) {
       case "location":
         return <Location />;
       case "property":
@@ -50,11 +50,15 @@ const Assets = () => {
           return (
             <Button
               key={tab.id}
-              variant={currentTab === tab.id ? "default" : "ghost"}
+              variant={activeTab === tab.id ? "default" : "ghost"}
               size="sm"
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => {
+                setActiveTab(tab.id);
+                // Update URL to reflect the current tab
+                window.history.pushState({}, '', `/assets/${tab.id}`);
+              }}
               className={`flex items-center gap-2 ${
-                currentTab === tab.id 
+                activeTab === tab.id 
                   ? "bg-primary text-primary-foreground" 
                   : "hover:bg-background"
               }`}

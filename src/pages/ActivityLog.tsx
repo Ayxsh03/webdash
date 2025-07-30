@@ -109,7 +109,12 @@ const ActivityLog = () => {
             <Trash2 className="h-4 w-4 mr-2" />
             DELETE ALL
           </Button>
-          <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+            onClick={() => console.log("Filter activity logs")}
+          >
             <Filter className="h-4 w-4 mr-2" />
             FILTER
           </Button>

@@ -94,11 +94,31 @@ const PeopleCount = () => {
           />
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+            onClick={() => {
+              console.log("Export people count data");
+              const csvData = "ID,Location,Device,Count,Timestamp\nPC001,Main Entrance,CAM001,45,2024-01-15 14:30:00";
+              const blob = new Blob([csvData], { type: 'text/csv' });
+              const url = window.URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = 'people-count-data.csv';
+              a.click();
+              window.URL.revokeObjectURL(url);
+            }}
+          >
             <Download className="h-4 w-4 mr-2" />
             EXPORT
           </Button>
-          <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+            onClick={() => console.log("Filter people count data")}
+          >
             <Filter className="h-4 w-4 mr-2" />
             FILTER
           </Button>
@@ -168,16 +188,29 @@ const PeopleCount = () => {
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-card border-border">
-                      <DropdownMenuItem className="hover:bg-muted cursor-pointer">
+                    <DropdownMenuContent align="end" className="bg-popover border-border">
+                      <DropdownMenuItem 
+                        className="hover:bg-muted cursor-pointer"
+                        onClick={() => console.log("View details for:", item.id)}
+                      >
                         <Eye className="mr-2 h-4 w-4" />
                         View Details
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="hover:bg-muted cursor-pointer">
+                      <DropdownMenuItem 
+                        className="hover:bg-muted cursor-pointer"
+                        onClick={() => console.log("View history for:", item.id)}
+                      >
                         <Users className="mr-2 h-4 w-4" />
                         View History
                       </DropdownMenuItem>
-                      <DropdownMenuItem className="text-destructive hover:bg-destructive/10 cursor-pointer">
+                      <DropdownMenuItem 
+                        className="text-destructive hover:bg-destructive/10 cursor-pointer"
+                        onClick={() => {
+                          if (confirm("Are you sure you want to delete this record?")) {
+                            console.log("Delete:", item.id);
+                          }
+                        }}
+                      >
                         <MoreHorizontal className="mr-2 h-4 w-4" />
                         Delete
                       </DropdownMenuItem>

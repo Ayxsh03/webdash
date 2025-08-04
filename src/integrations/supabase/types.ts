@@ -14,13 +14,182 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      alert_logs: {
+        Row: {
+          alert_type: string
+          camera_id: string
+          created_at: string
+          event_id: string | null
+          id: string
+          message: string | null
+          metadata: Json | null
+          sent_at: string | null
+          status: string | null
+        }
+        Insert: {
+          alert_type: string
+          camera_id: string
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          message?: string | null
+          metadata?: Json | null
+          sent_at?: string | null
+          status?: string | null
+        }
+        Update: {
+          alert_type?: string
+          camera_id?: string
+          created_at?: string
+          event_id?: string | null
+          id?: string
+          message?: string | null
+          metadata?: Json | null
+          sent_at?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alert_logs_camera_id_fkey"
+            columns: ["camera_id"]
+            isOneToOne: false
+            referencedRelation: "camera_devices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alert_logs_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "detection_events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      camera_devices: {
+        Row: {
+          created_at: string
+          id: string
+          last_heartbeat: string | null
+          location: string | null
+          name: string
+          rtsp_url: string
+          status: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_heartbeat?: string | null
+          location?: string | null
+          name: string
+          rtsp_url: string
+          status?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_heartbeat?: string | null
+          location?: string | null
+          name?: string
+          rtsp_url?: string
+          status?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      detection_events: {
+        Row: {
+          alert_sent: boolean | null
+          bbox_x1: number | null
+          bbox_x2: number | null
+          bbox_y1: number | null
+          bbox_y2: number | null
+          camera_id: string
+          camera_name: string | null
+          confidence: number
+          id: string
+          image_path: string | null
+          metadata: Json | null
+          person_id: number
+          timestamp: string
+        }
+        Insert: {
+          alert_sent?: boolean | null
+          bbox_x1?: number | null
+          bbox_x2?: number | null
+          bbox_y1?: number | null
+          bbox_y2?: number | null
+          camera_id: string
+          camera_name?: string | null
+          confidence: number
+          id?: string
+          image_path?: string | null
+          metadata?: Json | null
+          person_id: number
+          timestamp?: string
+        }
+        Update: {
+          alert_sent?: boolean | null
+          bbox_x1?: number | null
+          bbox_x2?: number | null
+          bbox_y1?: number | null
+          bbox_y2?: number | null
+          camera_id?: string
+          camera_name?: string | null
+          confidence?: number
+          id?: string
+          image_path?: string | null
+          metadata?: Json | null
+          person_id?: number
+          timestamp?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "detection_events_camera_id_fkey"
+            columns: ["camera_id"]
+            isOneToOne: false
+            referencedRelation: "camera_devices"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          role: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          role?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          role?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_role: {
+        Args: { user_id: string }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never

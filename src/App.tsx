@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
-import Login from "./pages/Login";
+import { Auth } from "./pages/Auth";
 import Footfall from "./pages/Footfall";
 import AIIntelligence from "./pages/AIIntelligence";
 import PeopleCount from "./pages/PeopleCount";
@@ -13,6 +13,7 @@ import Settings from "./pages/Settings";
 import ActivityLog from "./pages/ActivityLog";
 import NotFound from "./pages/NotFound";
 import { DashboardLayout } from "./components/layout/DashboardLayout";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -23,46 +24,62 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<Login />} />
+          <Route path="/auth" element={<Auth />} />
           <Route path="/" element={
-            <DashboardLayout>
-              <Dashboard />
-            </DashboardLayout>
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Dashboard />
+              </DashboardLayout>
+            </ProtectedRoute>
           } />
           <Route path="/footfall" element={
-            <DashboardLayout>
-              <Footfall />
-            </DashboardLayout>
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Footfall />
+              </DashboardLayout>
+            </ProtectedRoute>
           } />
           <Route path="/ai-intelligence" element={
-            <DashboardLayout>
-              <AIIntelligence />
-            </DashboardLayout>
+            <ProtectedRoute>
+              <DashboardLayout>
+                <AIIntelligence />
+              </DashboardLayout>
+            </ProtectedRoute>
           } />
           <Route path="/people-count" element={
-            <DashboardLayout>
-              <PeopleCount />
-            </DashboardLayout>
+            <ProtectedRoute>
+              <DashboardLayout>
+                <PeopleCount />
+              </DashboardLayout>
+            </ProtectedRoute>
           } />
           <Route path="/assets" element={
-            <DashboardLayout>
-              <Assets />
-            </DashboardLayout>
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Assets />
+              </DashboardLayout>
+            </ProtectedRoute>
           } />
           <Route path="/assets/:tab" element={
-            <DashboardLayout>
-              <Assets />
-            </DashboardLayout>
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Assets />
+              </DashboardLayout>
+            </ProtectedRoute>
           } />
           <Route path="/settings" element={
-            <DashboardLayout>
-              <Settings />
-            </DashboardLayout>
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Settings />
+              </DashboardLayout>
+            </ProtectedRoute>
           } />
           <Route path="/activity-log" element={
-            <DashboardLayout>
-              <ActivityLog />
-            </DashboardLayout>
+            <ProtectedRoute>
+              <DashboardLayout>
+                <ActivityLog />
+              </DashboardLayout>
+            </ProtectedRoute>
           } />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

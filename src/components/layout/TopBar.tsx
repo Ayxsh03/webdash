@@ -9,10 +9,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
 
 export const TopBar = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, signOut } = useAuth();
 
   const handleNotifications = () => {
     toast({
@@ -32,8 +34,9 @@ export const TopBar = () => {
     navigate("/settings");
   };
 
-  const handleLogout = () => {
-    navigate("/login");
+  const handleLogout = async () => {
+    await signOut();
+    navigate("/auth");
     toast({
       title: "Logged out",
       description: "You have been successfully logged out.",
@@ -70,7 +73,7 @@ export const TopBar = () => {
           <DropdownMenuContent align="end" className="bg-popover border-border">
             <DropdownMenuItem onClick={handleProfile} className="cursor-pointer">
               <User className="mr-2 h-4 w-4" />
-              Profile
+              {user?.email || "Profile"}
             </DropdownMenuItem>
             <DropdownMenuItem onClick={handleSettings} className="cursor-pointer">
               <SettingsIcon className="mr-2 h-4 w-4" />

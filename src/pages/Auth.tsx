@@ -23,7 +23,7 @@ export const Auth = () => {
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        navigate("/dashboard");
+        navigate("/");
       }
     };
     checkUser();
@@ -46,7 +46,7 @@ export const Auth = () => {
         title: "Success",
         description: "Signed in successfully",
       });
-      navigate("/dashboard");
+      navigate("/");
     } catch (error: any) {
       setError(error.message);
     } finally {
@@ -64,7 +64,7 @@ export const Auth = () => {
         email,
         password,
         options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
+          emailRedirectTo: `${window.location.origin}/`,
           data: {
             full_name: fullName,
           },
@@ -101,9 +101,9 @@ export const Auth = () => {
             <TabsContent value="signin">
               <form onSubmit={handleSignIn} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="signin-email">Email</Label>
                   <Input
-                    id="email"
+                    id="signin-email"
                     type="email"
                     placeholder="Enter your email"
                     value={email}
@@ -112,9 +112,9 @@ export const Auth = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="signin-password">Password</Label>
                   <Input
-                    id="password"
+                    id="signin-password"
                     type="password"
                     placeholder="Enter your password"
                     value={password}
@@ -147,9 +147,9 @@ export const Auth = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="signup-email">Email</Label>
                   <Input
-                    id="email"
+                    id="signup-email"
                     type="email"
                     placeholder="Enter your email"
                     value={email}
@@ -158,9 +158,9 @@ export const Auth = () => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="signup-password">Password</Label>
                   <Input
-                    id="password"
+                    id="signup-password"
                     type="password"
                     placeholder="Create a password"
                     value={password}

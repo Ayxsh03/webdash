@@ -26,6 +26,7 @@ services:
       - "8000:8000"
     environment:
       DATABASE_URL: postgresql://postgres:password@postgres:5432/detection_db
+      API_KEY: secure-detection-api-key-2024
     depends_on:
       postgres:
         condition: service_healthy

@@ -6,7 +6,7 @@ import json
 from datetime import datetime, timedelta
 from typing import List, Optional
 import os
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import uuid
 
 app = FastAPI(title="Person Detection API", version="1.0.0")
@@ -46,7 +46,7 @@ class DetectionEvent(BaseModel):
     camera_name: str
     image_path: Optional[str] = None
     alert_sent: bool = False
-    metadata: dict = {}
+    metadata: dict = Field(default_factory=dict)
 
 class CameraDevice(BaseModel):
     id: Optional[str] = None

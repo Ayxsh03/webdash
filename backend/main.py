@@ -144,6 +144,11 @@ async def create_detection_event(
             RETURNING id, timestamp, person_id, confidence, camera_name, image_path, alert_sent, metadata
         """
         
+        # Convert metadata to JSON string if it's a dict
+        metadata_str = event.metadata
+        if isinstance(event.metadata, dict):
+            metadata_str = json.dumps(event.metadata)
+        
         row = await conn.fetchrow(
             query,
             event.timestamp,
@@ -152,7 +157,7 @@ async def create_detection_event(
             event.camera_name,
             event.image_path,
             event.alert_sent,
-            json.dumps(event.metadata)
+            metadata_str
         )
         
         # Convert the row to a dict and handle metadata parsing

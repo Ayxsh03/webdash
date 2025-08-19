@@ -115,13 +115,32 @@ async def get_detection_events(
         
         rows = await conn.fetch(query, *params)
         events = [dict(row) for row in rows]
-        
+
         return {
             "events": events,
             "total": total,
             "page": page,
             "pages": (total + limit - 1) // limit
         }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/api/v1/events/{event_id}", response_model=DetectionEvent)
+async def get_detection_event(event_id: str, conn: asyncpg.Connection = Depends(get_db)):
+    """Get a single detection event by ID"""
+    try:
+        query = """
+            SELECT id, timestamp, person_id, confidence, camera_name,
+                   image_path, alert_sent, metadata
+            FROM detection_events
+            WHERE id = $1
+        """
+        row = await conn.fetchrow(query, event_id)
+        if not row:
+            raise HTTPException(status_code=404, detail="Detection event not found")
+        return DetectionEvent(**dict(row))
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

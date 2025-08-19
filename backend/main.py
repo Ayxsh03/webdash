@@ -39,7 +39,6 @@ async def get_db():
 
 # Pydantic models
 class DetectionEvent(BaseModel):
-    id: Optional[str] = None
     timestamp: datetime
     person_id: int
     confidence: float
@@ -130,7 +129,7 @@ async def get_detection_events(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-@app.post("/api/v1/events", response_model=DetectionEvent)
+@app.post("/api/v1/events")
 async def create_detection_event(
     event: DetectionEvent,
     conn: asyncpg.Connection = Depends(get_db),
@@ -156,7 +155,12 @@ async def create_detection_event(
             json.dumps(event.metadata)
         )
         
-        return DetectionEvent(**dict(row))
+        # Convert the row to a dict and handle metadata parsing
+        result = dict(row)
+        if isinstance(result['metadata'], str):
+            result['metadata'] = json.loads(result['metadata'])
+        
+        return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

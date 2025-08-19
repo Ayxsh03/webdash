@@ -148,10 +148,21 @@ async def create_detection_event(
             event.camera_name,
             event.image_path,
             event.alert_sent,
-            json.dumps(event.metadata)
+            event.metadata
         )
-        
-        return DetectionEvent(**dict(row))
+
+        result = {
+            "id": str(row["id"]),
+            "timestamp": row["timestamp"],
+            "person_id": row["person_id"],
+            "confidence": row["confidence"],
+            "camera_name": row["camera_name"],
+            "image_path": row["image_path"],
+            "alert_sent": row["alert_sent"],
+            "metadata": json.loads(row["metadata"]),
+        }
+
+        return DetectionEvent(**result)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

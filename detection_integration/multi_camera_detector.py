@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 # Configuration
 DATABASE_URL = "postgresql://postgres:postgres@localhost:5432/postgres"
 API_BASE_URL = "http://localhost:8000/api/v1"
-API_KEY = "your-api-key-here"  # Set this in environment or config
+API_KEY = "secure-detection-api-key-2024"  # Set this in environment or config
 CONFIDENCE_THRESHOLD = 0.5
 DETECTION_RESOLUTION = (640, 480)
 

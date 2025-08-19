@@ -22,7 +22,7 @@ app.add_middleware(
 
 # Configuration
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:password@localhost:5432/detection_db")
-API_KEY = os.getenv("API_KEY", "your-secure-api-key-here")
+API_KEY = os.getenv("API_KEY", "secure-detection-api-key-2024")
 
 # API Key validation
 async def validate_api_key(x_api_key: str | None = Header(default=None)):
@@ -47,6 +47,11 @@ class DetectionEvent(BaseModel):
     image_path: Optional[str] = None
     alert_sent: bool = False
     metadata: dict = Field(default_factory=dict)
+    
+    class Config:
+        json_encoders = {
+            datetime: lambda v: v.isoformat()
+        }
 
 class CameraDevice(BaseModel):
     id: Optional[str] = None

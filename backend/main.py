@@ -144,8 +144,8 @@ async def create_detection_event(
             RETURNING id, timestamp, person_id, confidence, camera_name, image_path, alert_sent, metadata
         """
         
-        # Always convert metadata to JSON string for database storage
-        metadata_str = json.dumps(event.metadata) if event.metadata else "{}"
+        # For JSONB column, pass the dict directly (PostgreSQL handles JSON conversion)
+        metadata_value = event.metadata if event.metadata else {}
         
         row = await conn.fetchrow(
             query,
@@ -155,7 +155,7 @@ async def create_detection_event(
             event.camera_name,
             event.image_path,
             event.alert_sent,
-            metadata_str
+            metadata_value
         )
         
         # Convert the row to a dict and handle metadata parsing

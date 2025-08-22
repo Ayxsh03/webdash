@@ -137,15 +137,22 @@ async def create_detection_event(
 ):
     """Create a new detection event"""
     try:
+        # Prepare metadata as a JSON string
+        metadata_json = "{}"
+        if event.metadata:
+            try:
+                metadata_json = json.dumps(event.metadata)
+            except (TypeError, ValueError) as e:
+                print(f"Warning: Could not serialize metadata: {e}")
+                metadata_json = "{}"
+        
+        # Insert query - explicitly cast metadata to JSONB
         query = """
             INSERT INTO detection_events 
             (timestamp, person_id, confidence, camera_name, image_path, alert_sent, metadata)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb)
             RETURNING id, timestamp, person_id, confidence, camera_name, image_path, alert_sent, metadata
         """
-        
-        # For JSONB column, convert to JSON string for asyncpg
-        metadata_value = json.dumps(event.metadata) if event.metadata else '{}'
         
         row = await conn.fetchrow(
             query,
@@ -155,17 +162,32 @@ async def create_detection_event(
             event.camera_name,
             event.image_path,
             event.alert_sent,
-            metadata_value
+            metadata_json
         )
         
-        # Convert the row to a dict and handle metadata parsing
-        result = dict(row)
-        if isinstance(result['metadata'], str):
-            result['metadata'] = json.loads(result['metadata'])
+        if not row:
+            raise HTTPException(status_code=500, detail="Failed to create event")
+        
+        # Convert row to dict
+        result = {
+            'id': str(row['id']),
+            'timestamp': row['timestamp'].isoformat(),
+            'person_id': row['person_id'],
+            'confidence': float(row['confidence']),
+            'camera_name': row['camera_name'],
+            'image_path': row['image_path'],
+            'alert_sent': row['alert_sent'],
+            'metadata': row['metadata'] if isinstance(row['metadata'], dict) else json.loads(row['metadata']) if row['metadata'] else {}
+        }
         
         return result
+        
+    except asyncpg.PostgresError as e:
+        print(f"Database error: {e}")
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"Unexpected error: {e}")
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
 @app.get("/api/v1/cameras")
 async def get_cameras(conn: asyncpg.Connection = Depends(get_db)):

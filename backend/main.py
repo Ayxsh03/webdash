@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 import asyncpg
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Optional
 import os
 from pydantic import BaseModel, Field
@@ -12,17 +12,25 @@ import uuid
 app = FastAPI(title="Person Detection API", version="1.0.0")
 
 # CORS middleware
+ALLOWED_ORIGINS = os.getenv(
+    "ALLOWED_ORIGINS",
+    "http://localhost:5173,http://localhost:3000,http://localhost:8080"
+).split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:3000"],  # Vite dev server
+    allow_origins=[o.strip() for o in ALLOWED_ORIGINS if o.strip()],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # Configuration
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://postgres:password@localhost:5432/detection_db")
-API_KEY = os.getenv("API_KEY", "secure-detection-api-key-2024")
+DATABASE_URL = os.getenv(
+    "DATABASE_URL"
+    # "postgresql://postgres:password@postgres:5432/detection_db"
+)
+API_KEY = os.getenv("API_KEY", "111-1111-1-11-1-11-1-1")
 
 # API Key validation
 async def validate_api_key(x_api_key: str | None = Header(default=None)):
@@ -30,8 +38,11 @@ async def validate_api_key(x_api_key: str | None = Header(default=None)):
         raise HTTPException(status_code=401, detail="Invalid API key")
     return True
 
+import ssl
+
 async def get_db():
-    conn = await asyncpg.connect(DATABASE_URL)
+    ssl_ctx = ssl.create_default_context() if "supabase.co" in DATABASE_URL else None
+    conn = await asyncpg.connect(DATABASE_URL, ssl=ssl_ctx)
     try:
         yield conn
     finally:
@@ -39,13 +50,18 @@ async def get_db():
 
 # Pydantic models
 class DetectionEvent(BaseModel):
-    timestamp: datetime
+    timestamp: Optional[datetime] = None
     person_id: int
     confidence: float
+    camera_id: str  # UUID as string
     camera_name: str
     image_path: Optional[str] = None
     alert_sent: bool = False
     metadata: dict = Field(default_factory=dict)
+    bbox_x1: Optional[float] = None
+    bbox_y1: Optional[float] = None
+    bbox_x2: Optional[float] = None
+    bbox_y2: Optional[float] = None
     
     class Config:
         json_encoders = {
@@ -108,8 +124,8 @@ async def get_detection_events(
         
         # Get events
         query = f"""
-            SELECT id, timestamp, person_id, confidence, camera_name, 
-                   image_path, alert_sent, metadata
+            SELECT id, timestamp, person_id, confidence, camera_id, camera_name, 
+                   image_path, alert_sent, metadata, bbox_x1, bbox_y1, bbox_x2, bbox_y2
             FROM detection_events 
             {where_clause}
             ORDER BY timestamp DESC 
@@ -137,7 +153,9 @@ async def create_detection_event(
 ):
     """Create a new detection event"""
     try:
-        # Prepare metadata as a JSON string
+        ts = event.timestamp or datetime.now(timezone.utc)
+        
+        # Prepare metadata as JSON string
         metadata_json = "{}"
         if event.metadata:
             try:
@@ -146,38 +164,51 @@ async def create_detection_event(
                 print(f"Warning: Could not serialize metadata: {e}")
                 metadata_json = "{}"
         
-        # Insert query - explicitly cast metadata to JSONB
+        # Insert with all required fields including camera_id and bbox columns
         query = """
             INSERT INTO detection_events 
-            (timestamp, person_id, confidence, camera_name, image_path, alert_sent, metadata)
-            VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb)
-            RETURNING id, timestamp, person_id, confidence, camera_name, image_path, alert_sent, metadata
+                (timestamp, person_id, confidence, camera_id, camera_name, image_path, alert_sent, metadata,
+                bbox_x1, bbox_y1, bbox_x2, bbox_y2)
+            VALUES
+                ($1, $2, $3, $4, $5, $6, $7, $8::jsonb, $9, $10, $11, $12)
+            RETURNING id, timestamp, person_id, confidence, camera_id, camera_name, image_path, alert_sent, metadata,
+                    bbox_x1, bbox_y1, bbox_x2, bbox_y2
         """
         
         row = await conn.fetchrow(
             query,
-            event.timestamp,
+            ts,
             event.person_id,
             event.confidence,
+            event.camera_id,
             event.camera_name,
             event.image_path,
             event.alert_sent,
-            metadata_json
+            metadata_json,
+            event.bbox_x1,
+            event.bbox_y1,
+            event.bbox_x2,
+            event.bbox_y2,
         )
         
         if not row:
             raise HTTPException(status_code=500, detail="Failed to create event")
         
-        # Convert row to dict
+        # Convert row to dict with proper typing
         result = {
-            'id': str(row['id']),
-            'timestamp': row['timestamp'].isoformat(),
-            'person_id': row['person_id'],
-            'confidence': float(row['confidence']),
-            'camera_name': row['camera_name'],
-            'image_path': row['image_path'],
-            'alert_sent': row['alert_sent'],
-            'metadata': row['metadata'] if isinstance(row['metadata'], dict) else json.loads(row['metadata']) if row['metadata'] else {}
+            "id": str(row["id"]),
+            "timestamp": row["timestamp"].isoformat(),
+            "person_id": row["person_id"],
+            "confidence": float(row["confidence"]),
+            "camera_id": str(row["camera_id"]),
+            "camera_name": row["camera_name"],
+            "image_path": row["image_path"],
+            "alert_sent": row["alert_sent"],
+            "metadata": row["metadata"] or {},
+            "bbox_x1": float(row["bbox_x1"]) if row["bbox_x1"] is not None else None,
+            "bbox_y1": float(row["bbox_y1"]) if row["bbox_y1"] is not None else None,
+            "bbox_x2": float(row["bbox_x2"]) if row["bbox_x2"] is not None else None,
+            "bbox_y2": float(row["bbox_y2"]) if row["bbox_y2"] is not None else None,
         }
         
         return result
@@ -194,7 +225,7 @@ async def get_cameras(conn: asyncpg.Connection = Depends(get_db)):
     """Get all cameras"""
     try:
         query = """
-            SELECT id, name, rtsp_url, status, location, last_heartbeat
+            SELECT id, name, rtsp_url, status, location, last_heartbeat, created_at, updated_at
             FROM camera_devices
             ORDER BY name
         """

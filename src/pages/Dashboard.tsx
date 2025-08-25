@@ -3,8 +3,12 @@ import { StatsCard } from "@/components/dashboard/StatsCard";
 import { EventChart } from "@/components/dashboard/EventChart";
 import { DateRangePicker } from "@/components/dashboard/DateRangePicker";
 import { useDashboardStats, useCameras } from "@/hooks/useDetectionData";
+import { useRealtimeDetections } from "@/hooks/useRealtimeDetections";
 
 const Dashboard = () => {
+  // Enable real-time updates
+  useRealtimeDetections();
+  
   const { data: stats, isLoading: statsLoading } = useDashboardStats();
   const { data: cameras } = useCameras();
 

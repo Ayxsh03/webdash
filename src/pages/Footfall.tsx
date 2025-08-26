@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Search, Download, Filter, Eye, Trash2, Edit, MoreHorizontal, RotateCcw } from "lucide-react";
 import { useDetectionEvents } from "@/hooks/useDetectionData";
@@ -19,39 +20,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-
-const mockFootfallData = [
-  {
-    id: 1,
-    timestamp: "2024-01-28 09:15:23",
-    location: "Main Entrance",
-    person_count: 5,
-    image: "/placeholder.svg",
-    confidence: 98.5,
-    gender: "Mixed",
-    age_group: "Adult",
-  },
-  {
-    id: 2,
-    timestamp: "2024-01-28 09:12:45",
-    location: "South Gate",
-    person_count: 2,
-    image: "/placeholder.svg",
-    confidence: 95.2,
-    gender: "Female",
-    age_group: "Adult",
-  },
-  {
-    id: 3,
-    timestamp: "2024-01-28 09:08:12",
-    location: "Emergency Exit",
-    person_count: 1,
-    image: "/placeholder.svg",
-    confidence: 99.1,
-    gender: "Male",
-    age_group: "Senior",
-  },
-];
 
 const Footfall = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -163,9 +131,18 @@ const Footfall = () => {
                       <div className="w-16 h-12 bg-muted rounded overflow-hidden">
                         {event.image_path ? (
                           <img 
-                            src={`/api/images/${event.image_path}`}
+                            src={`http://localhost:8000/images/${event.image_path}`}
                             alt="Detection"
                             className="w-full h-full object-cover"
+                            onError={(e) => {
+                              // Fallback if image fails to load
+                              const target = e.target as HTMLImageElement;
+                              target.style.display = 'none';
+                              const parent = target.parentElement;
+                              if (parent) {
+                                parent.innerHTML = '<div class="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center"><span class="text-xs text-muted-foreground">No Image</span></div>';
+                              }
+                            }}
                           />
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">

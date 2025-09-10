@@ -11,7 +11,8 @@ import {
   Settings, 
   Activity,
   Menu,
-  Shield
+  Shield,
+  Video
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -23,6 +24,7 @@ interface SidebarProps {
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/" },
+  { icon: Video, label: "Live Feed", href: "/live-feed" },
   { icon: Users, label: "Footfall", href: "/footfall" },
   { icon: Brain, label: "AI Intelligence", href: "/ai-intelligence" },
   { icon: Users2, label: "People Count", href: "/people-count" },

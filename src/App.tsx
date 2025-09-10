@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import { Auth } from "./pages/Auth";
+import LiveFeed from "./pages/LiveFeed";
 import Footfall from "./pages/Footfall";
 import AIIntelligence from "./pages/AIIntelligence";
 import PeopleCount from "./pages/PeopleCount";
@@ -29,6 +30,13 @@ const App = () => (
             <ProtectedRoute>
               <DashboardLayout>
                 <Dashboard />
+              </DashboardLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/live-feed" element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <LiveFeed />
               </DashboardLayout>
             </ProtectedRoute>
           } />

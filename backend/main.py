@@ -268,6 +268,34 @@ async def get_trends(conn: asyncpg.Connection = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+@app.get("/api/v1/people-count")
+async def get_people_count(conn: asyncpg.Connection = Depends(get_db)):
+    """Get people count grouped by camera"""
+    try:
+        query = """
+            SELECT camera_id, camera_name, COUNT(*) AS people_count, metadata
+            FROM detection_events
+            GROUP BY camera_id, camera_name, metadata
+            ORDER BY camera_name
+        """
+        rows = await conn.fetch(query)
+        devices = [
+            {
+                "camera_id": str(r["camera_id"]),
+                "camera_name": r["camera_name"],
+                "count": r["people_count"],
+                "metadata": (
+                    json.loads(raw_meta)
+                    if isinstance(raw_meta := r["metadata"], str)
+                    else (raw_meta or {})
+                ),
+            }
+            for r in rows
+        ]
+        return {"devices": devices}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 @app.put("/api/v1/cameras/{camera_id}/status")
 async def update_camera_status(
     camera_id: str,
